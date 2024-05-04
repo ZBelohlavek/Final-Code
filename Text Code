@@ -1,0 +1,61 @@
+import kotlin.random.Random
+
+class ExtendedLibrary {
+    public val books: MutableMap<String, BookInfo> = mutableMapOf()
+
+    data class BookInfo(var isAvailable: Boolean, var price: Double, var rating: Double? = null)
+
+    fun addBook(title: String, price: Double) {
+        books[title] = BookInfo(true, price)
+        println("Book added: $title with price $$price")
+    }
+
+    fun checkStatus(title: String) {
+        books[title]?.let {
+            val status = if (it.isAvailable) "available" else "checked out"
+            val ratingInfo = it.rating?.let { rating -> ", rated $rating/5" } ?: ""
+            println("The book '$title' is $status at a price of $${it.price}$ratingInfo.")
+        } ?: println("The book '$title' does not exist in the library.")
+    }
+
+    fun checkOutBook(title: String) {
+        books[title]?.let {
+            if (it.isAvailable) {
+                it.isAvailable = false
+                println("You have checked out the book '$title'.")
+            } else {
+                println("The book '$title' is not available for checkout.")
+            }
+        } ?: println("The book '$title' does not exist in the library.")
+    }
+
+    fun checkInBook(title: String) {
+        books[title]?.let {
+            if (!it.isAvailable) {
+                it.isAvailable = true
+                println("You have checked in the book '$title'.")
+            } else {
+                println("The book '$title' was not checked out.")
+            }
+        } ?: println("The book '$title' does not exist in the library.")
+    }
+}
+
+// Extension function to assign a random rating to a BookInfo
+fun ExtendedLibrary.BookInfo.assignRandomRating() {
+    this.rating = Random.nextDouble(1.0, 5.0).toBigDecimal().setScale(2, java.math.RoundingMode.HALF_UP).toDouble()
+    println("Rating assigned: $rating/5")
+}
+
+fun main() {
+    val library = ExtendedLibrary()
+    library.addBook("1984", 9.99)
+    library.addBook("Brave New World", 8.99)
+
+    // Assign random ratings to books
+    library.books["1984"]?.assignRandomRating()
+    library.books["Brave New World"]?.assignRandomRating()
+
+    library.checkStatus("1984")
+    library.checkStatus("Brave New World")
+}
